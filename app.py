@@ -31,6 +31,25 @@ if uploaded_file is not None:
     st.write("ピクセルアート:")
     st.image(display_image)
     
+    # 画像を分割する
+    split_width = st.sidebar.number_input("分割する横幅（ドット）", min_value=1, max_value=width, value=16, step=1)
+    split_height = st.sidebar.number_input("分割する縦幅（ドット）", min_value=1, max_value=height, value=16, step=1)
+    
+    # 分割された画像を保存してダウンロードボタンを作成
+    for i in range(0, width, split_width):
+        for j in range(0, height, split_height):
+            box = (i, j, min(i + split_width, width), min(j + split_height, height))
+            split_image = pixel_art.crop(box)
+            
+            buf = io.BytesIO()
+            split_image.save(buf, format="PNG")
+            st.download_button(
+                label=f"ピクセルアート_{i}_{j}をダウンロード",
+                data=buf.getvalue(),
+                file_name=f"pixel_art_{i}_{j}.png",
+                mime="image/png"
+            )
+    
     # ダウンロードボタン
     buf = io.BytesIO()
     pixel_art.save(buf, format="PNG")
